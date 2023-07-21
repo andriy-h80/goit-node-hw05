@@ -99,7 +99,7 @@ const updateAvatar = async(req, res) => {
     .then((avatar) => {
         return avatar
           .resize(250, 250)
-          .write(tempUpload);
+          .write(resultUpload);
     })
     .catch((error) => {
         console.error(error);
