@@ -5,12 +5,16 @@
   -  у відповіді повинен повертатися об'єкт user з 2 полями email и subscription з типом даних String
 
 */
-const express = require("express");
+
 const request = require("supertest");
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const { DB_HOST } = process.env;
 
 const {login} = require("./users");
 
-const app = express();
+const app = require("../app");
 
 app.post("/users/login", login);
 
@@ -19,19 +23,25 @@ describe("test login controller", () => {
     let response;
 
     beforeAll(() => {
-        server = app.listen(3000);
+        mongoose
+        .connect(DB_HOST)
+        .then(() => (server = app.listen(3000)))
+        .catch(e => process.exit(1));
     });
 
     afterAll(() => {
-        server.close();
+        mongoose.disconnect(DB_HOST).then(() => {
+            server.close();
+        });
     });
 
     beforeEach(async () => {
         response = await request(app)
         .post("/users/login")
-        .auth("email", "password");
-        // .auth("andriy@gmail.com", "andriy");
-        console.log(response.user)
+        .send({
+            email: "andriy@gmail.com",
+            password: "andriy",
+          });
     });
 
     test("response.status(200)", async () => {
